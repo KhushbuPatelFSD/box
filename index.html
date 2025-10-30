@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Interactive Box-Sizing Comparison</title>
+    <style>
+      body {
+        font-family: "Segoe UI", Arial, sans-serif;
+        margin: 20px;
+        background-color: rgb(176, 190, 197);
+        color: #222;
+      }
+
+      h2 {
+        text-align: center;
+        color: #0d47a1;
+        margin-bottom: 10px;
+      }
+
+      .controls {
+        text-align: center;
+        margin-bottom: 25px;
+        background: #fff;
+        padding: 15px;
+        border-radius: 10px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+        max-width: 600px;
+        margin-left: auto;
+        margin-right: auto;
+      }
+
+      .controls label {
+        font-weight: 600;
+        display: inline-block;
+        margin: 10px;
+      }
+
+      .controls input[type="range"] {
+        width: 150px;
+        margin: 0 10px;
+        vertical-align: middle;
+      }
+
+      .demo-container {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 20px;
+      }
+
+      .box {
+        width: 250px;
+        height: 150px;
+        box-shadow: 6px 6px 15px rgba(0, 0, 0, 0.25);
+        text-align: center;
+        font-weight: 500;
+        border-radius: 10px;
+        transition: all 0.2s ease;
+        box-sizing: content-box; /* default */
+      }
+
+      .box1 {
+        border: 5px solid #00796b;
+        background-color: rgb(224, 242, 241);
+        box-sizing: content-box;
+      }
+
+      .box2 {
+        border: 5px solid #6a1b9a;
+        background-color: rgb(243, 229, 245);
+        box-sizing: border-box;
+      }
+
+      .info {
+        text-align: center;
+        margin-top: 10px;
+        font-size: 14px;
+      }
+
+      .result {
+        background: #ffffff;
+        padding: 15px;
+        border-radius: 10px;
+        margin-top: 25px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.15);
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 15px;
+        margin-top: 10px;
+      }
+
+      th,
+      td {
+        padding: 10px;
+        border-bottom: 1px solid #ccc;
+      }
+
+      th {
+        background-color: #0d47a1;
+        color: white;
+      }
+
+      @media (max-width: 600px) {
+        .demo-container {
+          flex-direction: column;
+          align-items: center;
+        }
+      }
+    </style>
+  </head>
+
+  <body>
+    <h2>Interactive Box-Sizing Comparison</h2>
+
+    <div class="controls">
+      <label
+        >Padding:
+        <input
+          type="range"
+          id="paddingRange"
+          min="0"
+          max="50"
+          value="20"
+          oninput="updateBoxes()"
+        />
+        <span id="paddingValue">20</span> px
+      </label>
+
+      <label
+        >Border Width:
+        <input
+          type="range"
+          id="borderRange"
+          min="0"
+          max="30"
+          value="5"
+          oninput="updateBoxes()"
+        />
+        <span id="borderValue">5</span> px
+      </label>
+    </div>
+
+    <div class="demo-container">
+      <div class="box box1" id="box1">
+        <b>Box 1 – content-box</b><br />
+        Padding and border add to total size
+      </div>
+
+      <div class="box box2" id="box2">
+        <b>Box 2 – border-box</b><br />
+        Padding and border stay inside size
+      </div>
+    </div>
+
+    <div class="info">
+      <p><b>Tip:</b> Move sliders to see how both boxes react differently.</p>
+    </div>
+
+    <div class="result">
+      <h3>Calculated Total Sizes</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>Box</th>
+            <th>box-sizing</th>
+            <th>Declared Size</th>
+            <th>Rendered Width × Height</th>
+            <th>Explanation</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr id="row1"></tr>
+          <tr id="row2"></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <script>
+      function updateBoxes() {
+        const padding = parseInt(document.getElementById("paddingRange").value);
+        const border = parseInt(document.getElementById("borderRange").value);
+
+        document.getElementById("paddingValue").textContent = padding;
+        document.getElementById("borderValue").textContent = border;
+
+        const box1 = document.getElementById("box1");
+        const box2 = document.getElementById("box2");
+
+        // Update styles dynamically
+        box1.style.padding = padding + "px";
+        box1.style.borderWidth = border + "px";
+        box2.style.padding = padding + "px";
+        box2.style.borderWidth = border + "px";
+
+        // Fixed declared size
+        const declaredWidth = 250;
+        const declaredHeight = 150;
+
+        // Calculate rendered sizes
+        const contentBoxWidth = declaredWidth + 2 * (padding + border);
+        const contentBoxHeight = declaredHeight + 2 * (padding + border);
+
+        const borderBoxWidth = declaredWidth;
+        const borderBoxHeight = declaredHeight;
+
+        // Update table
+        document.getElementById("row1").innerHTML = `
+    <td>Box 1</td>
+    <td>content-box</td>
+    <td>${declaredWidth}×${declaredHeight} px</td>
+    <td>${contentBoxWidth}×${contentBoxHeight} px</td>
+    <td>Padding & border add outside total size</td>
+  `;
+
+        document.getElementById("row2").innerHTML = `
+    <td>Box 2</td>
+    <td>border-box</td>
+    <td>${declaredWidth}×${declaredHeight} px</td>
+    <td>${borderBoxWidth}×${borderBoxHeight} px</td>
+    <td>Padding & border stay inside total size</td>
+  `;
+      }
+
+      // Initialize
+      updateBoxes();
+    </script>
+  </body>
+</html>
